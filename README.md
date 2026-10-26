@@ -1,8 +1,6 @@
 # IoT Control
 
-Checkpoint 3 — Mobile Development & IoT. Aplicativo em React Native, Expo e TypeScript para monitorar sensores e controlar uma lâmpada por MQTT.
-
-> Projeto em construção: a estrutura inicial ainda não implementa a comunicação MQTT, o simulador ou os requisitos completos do checkpoint.
+Checkpoint 3 — Mobile Development & IoT. Aplicativo em React Native, Expo e TypeScript para monitorar temperatura e umidade e controlar uma lâmpada simulada via MQTT.
 
 ## Integrantes
 
@@ -12,26 +10,57 @@ Checkpoint 3 — Mobile Development & IoT. Aplicativo em React Native, Expo e Ty
 - RM556930 — Matheus Ricciotti
 - RM555189 — Matheus Bortolotto
 
-## Execução
+## Tecnologias
 
-Requisitos: Node.js e npm instalados; Expo Go ou emulador Android/iOS para executar no dispositivo.
+Expo SDK 54, React Native 0.81, React 19, TypeScript, MQTT.js e AsyncStorage. Consulte o `package.json` para as versões declaradas.
+
+## Instalação e execução
+
+Requisitos: Node.js, npm, Expo Go compatível com SDK 54 ou emulador Android/iOS.
 
 ```bash
 npm install
 npx expo start
 ```
 
-Para a versão web, execute `npm run web`. A compatibilidade com Android e iOS deverá ser testada durante a implementação.
+Com o emulador aberto, pressione `a` para Android ou `i` para iOS. Para Web, pressione `w`. Em outro terminal, na mesma pasta, execute o simulador:
 
-## Estrutura
+```bash
+npm run simulator
+```
 
-- `src/screens`: telas do aplicativo.
-- `src/components`: componentes reutilizáveis.
-- `src/services`: comunicação MQTT e armazenamento local.
-- `src/types`: tipos compartilhados.
-- `src/themes`: cores e temas.
-- `simulator`: futuro simulador do dispositivo IoT.
+No aplicativo, abra **Configurações** e toque em **Conectar**. O endereço padrão é `wss://broker.hivemq.com:8884/mqtt`, MQTT sobre WebSocket seguro. É possível alterá-lo e salvá-lo ao conectar. O broker público é compartilhado e pode ficar indisponível; não envie dados sensíveis. O simulador e o aplicativo precisam usar o mesmo broker e tópico-base. Para trocar o broker do simulador no PowerShell:
 
-## Próximos passos
+```powershell
+$env:MQTT_URL = 'wss://broker.hivemq.com:8884/mqtt'
+npm run simulator
+```
 
-Implementar conexão MQTT via WebSocket, sensores, comandos e confirmação da lâmpada, histórico, preferências com AsyncStorage, temas e simulador. Documentar o broker, tópicos, payloads, versões, prints e instruções de demonstração antes da entrega.
+## Tópicos e mensagens
+
+Base exclusiva do grupo: `fiap/3espv/mobile-mqtt-rm556930`.
+
+| Sufixo | Direção no app | Exemplo |
+| --- | --- | --- |
+| `/sensor/temperatura` | Recebe | `{"value":24.5}` |
+| `/sensor/umidade` | Recebe | `{"value":58}` |
+| `/lampada/comando` | Envia | `{"action":"ON"}` ou `{"action":"OFF"}` |
+| `/lampada/estado` | Recebe | `{"state":"ON"}` ou `{"state":"OFF"}` |
+
+## Demonstração
+
+1. Inicie o simulador e conecte o aplicativo ao mesmo broker.
+2. Verifique que temperatura e umidade aparecem e mudam a cada cinco segundos.
+3. Toque em **Ligar**: o simulador registra o comando, publica a confirmação e o aplicativo mostra **Ligada**.
+4. Repita com **Desligar**; confira o histórico das últimas dez mensagens.
+5. Em Configurações, alterne o tema e reinicie o app para verificar a persistência. A URL também é salva ao conectar.
+
+O estado só muda após uma mensagem válida de confirmação. Mensagens inválidas aparecem no histórico, mas não alteram as leituras. Ao desconectar, comandos são recusados com aviso. O histórico é mantido somente durante a sessão. O simulador confirma o estado inicial ao conectar; como não usa mensagens retidas, se o app conectar depois, o estado aparece ao receber o próximo comando confirmado.
+
+## Telas
+
+- **Dashboard:** conexão, leituras com horário, estado confirmado e comandos.
+- **Histórico:** dez mensagens mais recentes com tópico, payload, direção e horário.
+- **Configurações:** broker, conexão e tema claro/escuro.
+
+Os prints do app em execução ainda precisam ser adicionados para a entrega. Teste o fluxo também no Android e iOS: gerar o pacote não substitui a verificação em dispositivo. A entrega é o link acessível do repositório no Teams.
