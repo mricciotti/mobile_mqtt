@@ -59,48 +59,58 @@ O estado só muda após uma mensagem válida de confirmação. Mensagens inváli
 
 ## Telas e evidências
 
-Capturas reais fornecidas pelo grupo durante a execução no **Pixel 4 emulado (Android)**. Clique nas imagens para visualizar em tamanho completo.
+Capturas reais da aplicação **Expo Web**, feitas pelo navegador durante o teste em 26/10/2026. As imagens mostram somente a aplicação, sem o desktop. Clique em cada captura para ampliá-la.
 
-| Tela | Funcionalidade |
-| --- | --- |
-| Dashboard | Conexão, temperatura, umidade, comandos e estado confirmado da lâmpada |
-| Histórico | Últimas 10 mensagens da sessão, com direção, horário, tópico e conteúdo |
-| Configurações | Endereço do broker, conectar/desconectar e escolha de tema |
-
-### Dashboard e comunicação MQTT
-
-A captura mostra o tema escuro, as leituras recebidas e a mensagem **“Estado da lâmpada confirmado”**, com o simulador em execução no terminal.
-
-<a href="docs/evidencias/dashboard.png"><img src="docs/evidencias/dashboard.png" alt="Dashboard Android com sensores e confirmação da lâmpada, ao lado do simulador" width="760"></a>
-
-### Histórico e configurações
+### Tema claro
 
 <table>
-  <tr>
-    <th>Histórico de sensores</th>
-    <th>Configurações da conexão</th>
-  </tr>
-  <tr>
-    <td align="center"><a href="docs/evidencias/historico.png"><img src="docs/evidencias/historico.png" alt="Histórico Android com mensagens de temperatura e umidade" width="280"></a></td>
-    <td align="center"><a href="docs/evidencias/configuracoes.png"><img src="docs/evidencias/configuracoes.png" alt="Configurações Android com URL WebSocket e seletor de tema" width="280"></a></td>
-  </tr>
+<tr><th>Dashboard</th><th>Histórico</th><th>Configurações</th></tr>
+<tr><td align="center"><a href="docs/evidencias/web/dashboard-claro.jpg"><img src="docs/evidencias/web/dashboard-claro.jpg" alt="dashboard na Web em tema claro" width="250"></a></td><td align="center"><a href="docs/evidencias/web/historico-claro.jpg"><img src="docs/evidencias/web/historico-claro.jpg" alt="historico na Web em tema claro" width="250"></a></td><td align="center"><a href="docs/evidencias/web/configuracoes-claro.jpg"><img src="docs/evidencias/web/configuracoes-claro.jpg" alt="configuracoes na Web em tema claro" width="250"></a></td></tr>
 </table>
 
-A captura de Configurações foi feita antes da correção do texto de confirmação; a versão atual já contém esse ajuste.
+### Tema escuro
 
-### Evidência de comando e resposta
+<table>
+<tr><th>Dashboard</th><th>Histórico</th><th>Configurações</th></tr>
+<tr><td align="center"><a href="docs/evidencias/web/dashboard-escuro.jpg"><img src="docs/evidencias/web/dashboard-escuro.jpg" alt="dashboard na Web em tema escuro" width="250"></a></td><td align="center"><a href="docs/evidencias/web/historico-escuro.jpg"><img src="docs/evidencias/web/historico-escuro.jpg" alt="historico na Web em tema escuro" width="250"></a></td><td align="center"><a href="docs/evidencias/web/configuracoes-escuro.jpg"><img src="docs/evidencias/web/configuracoes-escuro.jpg" alt="configuracoes na Web em tema escuro" width="250"></a></td></tr>
+</table>
 
-O comando `{"action":"OFF"}` aparece como **Enviada**. A resposta `{"state":"OFF"}` aparece como **Recebida**, demonstrando que o aplicativo recebe o estado do simulador.
+### O que foi verificado na Web
 
-<a href="docs/evidencias/comando-historico.png"><img src="docs/evidencias/comando-historico.png" alt="Histórico Android com comando OFF enviado e estado OFF recebido" width="280"></a>
+| Fluxo | Resultado observado |
+| --- | --- |
+| Conexão | Conectou ao broker HiveMQ via WebSocket seguro |
+| Sensores | Recebeu temperatura e umidade do simulador e atualizou a tela |
+| Ligar e desligar | Enviou ON/OFF e recebeu as confirmações de estado |
+| Confirmação | Exibiu “Estado da lâmpada confirmado” após a resposta |
+| Histórico | Registrou comandos enviados e estados recebidos; a lista contém as últimas 10 mensagens da sessão |
+| Temas | Alternou entre claro e escuro nas telas |
+| Reinício | Recarregar o aplicativo iniciou nova sessão desconectada, sem as leituras anteriores |
 
-### Ambiente e limites da validação
+As leituras são simuladas. Os horários das novas capturas seguem o fuso do navegador; os números variam conforme as mensagens recebidas. Os prints do histórico mostram a parte visível de uma lista com rolagem.
 
-- **Android:** fluxo demonstrado no emulador pelo grupo, incluindo sensores e comandos ON/OFF.
-- **Web:** compilação verificada; estas imagens são do Android, não da versão Web.
+<details>
+<summary><strong>Evidências complementares no Android — Pixel 4 emulado</strong></summary>
+
+As capturas abaixo foram fornecidas pelo grupo nos testes do Android. Elas preservam o contexto do simulador e do emulador.
+
+| Evidência | Imagem |
+| --- | --- |
+| Dashboard e simulador | [Abrir captura](docs/evidencias/dashboard.png) |
+| Leituras no histórico | [Abrir captura](docs/evidencias/historico.png) |
+| Comando enviado e confirmação recebida | [Abrir captura](docs/evidencias/comando-historico.png) |
+| Configurações | [Abrir captura](docs/evidencias/configuracoes.png) |
+
+A captura Android de Configurações é anterior ao ajuste do texto de confirmação. Os horários seguem o fuso configurado no emulador.
+
+</details>
+
+### Limites da validação
+
+- **Android:** fluxo demonstrado pelo grupo no emulador Pixel 4.
+- **Web:** conexão, sensores, comandos, confirmações, histórico e alternância de tema exercitados no navegador.
 - **iOS:** pacote JavaScript compilado, sem execução em dispositivo ou simulador iOS.
-- **Horários:** as capturas usam o fuso configurado no emulador.
-- **Histórico:** mantido somente durante a sessão; reiniciar o aplicativo inicia uma lista vazia.
+- A persistência da URL alterada e do tema após encerrar/reabrir o aplicativo ainda precisa de verificação específica.
 
 ## Entrega
 
