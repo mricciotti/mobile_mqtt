@@ -57,30 +57,51 @@ Base exclusiva do grupo: `fiap/3espv/mobile-mqtt-rm556930`.
 
 O estado só muda após uma mensagem válida de confirmação. Mensagens inválidas aparecem no histórico, mas não alteram as leituras. Ao desconectar, comandos são recusados com aviso. O histórico é mantido somente durante a sessão. O simulador confirma o estado inicial ao conectar; como não usa mensagens retidas, se o app conectar depois, o estado aparece ao receber o próximo comando confirmado.
 
-## Telas
+## Telas e evidências
 
-- **Dashboard:** conexão, leituras com horário, estado confirmado e comandos.
-- **Histórico:** dez mensagens mais recentes com tópico, payload, direção e horário.
-- **Configurações:** broker, conexão e tema claro/escuro.
+Capturas reais fornecidas pelo grupo durante a execução no **Pixel 4 emulado (Android)**. Clique nas imagens para visualizar em tamanho completo.
 
-### Evidências de execução no Android
+| Tela | Funcionalidade |
+| --- | --- |
+| Dashboard | Conexão, temperatura, umidade, comandos e estado confirmado da lâmpada |
+| Histórico | Últimas 10 mensagens da sessão, com direção, horário, tópico e conteúdo |
+| Configurações | Endereço do broker, conectar/desconectar e escolha de tema |
 
-As imagens foram capturadas durante testes no emulador Android. O horário exibido segue o fuso configurado no emulador.
+### Dashboard e comunicação MQTT
 
-**Dashboard em tema escuro:** leituras de temperatura e umidade e confirmação de estado da lâmpada, com o simulador em execução.
+A captura mostra o tema escuro, as leituras recebidas e a mensagem **“Estado da lâmpada confirmado”**, com o simulador em execução no terminal.
 
-![Dashboard e simulador](docs/evidencias/dashboard.png)
+<a href="docs/evidencias/dashboard.png"><img src="docs/evidencias/dashboard.png" alt="Dashboard Android com sensores e confirmação da lâmpada, ao lado do simulador" width="760"></a>
 
-**Histórico:** mensagens recebidas dos sensores com horário, tópico e payload.
+### Histórico e configurações
 
-![Histórico de sensores](docs/evidencias/historico.png)
+<table>
+  <tr>
+    <th>Histórico de sensores</th>
+    <th>Configurações da conexão</th>
+  </tr>
+  <tr>
+    <td align="center"><a href="docs/evidencias/historico.png"><img src="docs/evidencias/historico.png" alt="Histórico Android com mensagens de temperatura e umidade" width="280"></a></td>
+    <td align="center"><a href="docs/evidencias/configuracoes.png"><img src="docs/evidencias/configuracoes.png" alt="Configurações Android com URL WebSocket e seletor de tema" width="280"></a></td>
+  </tr>
+</table>
 
-**Comando e confirmação:** o histórico registra o comando enviado e o estado recebido.
+A captura de Configurações foi feita antes da correção do texto de confirmação; a versão atual já contém esse ajuste.
 
-![Comando e confirmação no histórico](docs/evidencias/comando-historico.png)
+### Evidência de comando e resposta
 
-**Configurações:** endereço do broker, conexão e seletor de tema. Captura anterior ao ajuste da mensagem de confirmação.
+O comando `{"action":"OFF"}` aparece como **Enviada**. A resposta `{"state":"OFF"}` aparece como **Recebida**, demonstrando que o aplicativo recebe o estado do simulador.
 
-![Configurações](docs/evidencias/configuracoes.png)
+<a href="docs/evidencias/comando-historico.png"><img src="docs/evidencias/comando-historico.png" alt="Histórico Android com comando OFF enviado e estado OFF recebido" width="280"></a>
 
-O fluxo foi demonstrado em emulador Android. A compilação do pacote JavaScript para iOS foi concluída, mas a execução no iOS ainda não foi validada em dispositivo ou simulador. A entrega é o link acessível do repositório no Teams.
+### Ambiente e limites da validação
+
+- **Android:** fluxo demonstrado no emulador pelo grupo, incluindo sensores e comandos ON/OFF.
+- **Web:** compilação verificada; estas imagens são do Android, não da versão Web.
+- **iOS:** pacote JavaScript compilado, sem execução em dispositivo ou simulador iOS.
+- **Horários:** as capturas usam o fuso configurado no emulador.
+- **Histórico:** mantido somente durante a sessão; reiniciar o aplicativo inicia uma lista vazia.
+
+## Entrega
+
+Enviar somente o link acessível deste repositório na tarefa do Microsoft Teams. Não é necessário vídeo ou apresentação.
