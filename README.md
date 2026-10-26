@@ -6,7 +6,11 @@ Checkpoint 3 — Mobile Development & IoT. Aplicativo em React Native, Expo e Ty
 
 ## Integrantes
 
-**Pendente:** adicionar nome completo e RM de todos os integrantes antes da entrega. A ausência dessas informações implica nota zero.
+- RM554673 — Fernanda Rocha Menon
+- RM556237 — Luiza Macena Dantas
+- RM558537 — Luan Ramos Garcia de Souza
+- RM556930 — Matheus Ricciotti
+- RM555189 — Matheus Bortolotto
 
 ## Execução
 
