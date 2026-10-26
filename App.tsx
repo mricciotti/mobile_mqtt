@@ -12,6 +12,7 @@ const fmt = (time: number) => new Date(time).toLocaleTimeString('pt-BR');
 
 export default function App() {
   const service = useRef(new MqttService()).current;
+  const pendingLamp = useRef<LampState | null>(null);
   const [screen, setScreen] = useState<Screen>('dashboard');
   const [url, setUrl] = useState(DEFAULT_URL);
   const [theme, setTheme] = useState<Theme>('light');
@@ -49,17 +50,24 @@ export default function App() {
       const now = Date.now();
       if (topic === TOPICS.temperature && typeof record.value === 'number' && Number.isFinite(record.value)) setTemperature({ value: record.value, at: now });
       if (topic === TOPICS.humidity && typeof record.value === 'number' && Number.isFinite(record.value) && record.value >= 0 && record.value <= 100) setHumidity({ value: record.value, at: now });
-      if (topic === TOPICS.state && (record.state === 'ON' || record.state === 'OFF')) setLamp({ state: record.state, at: now });
+      if (topic === TOPICS.state && (record.state === 'ON' || record.state === 'OFF')) {
+        setLamp({ state: record.state, at: now });
+        if (pendingLamp.current === record.state) {
+          pendingLamp.current = null;
+          setDetail('Estado da lâmpada confirmado.');
+        }
+      }
     } catch { /* Dados inválidos permanecem no histórico, sem alterar o painel. */ }
   }
   async function connect() {
     const address = url.trim();
     if (!/^wss?:\/\/\S+$/i.test(address)) { setStatus('error'); setDetail('Informe uma URL WebSocket válida, começando com ws:// ou wss://.'); return; }
     try { await AsyncStorage.setItem('brokerUrl', address); } catch { setDetail('Não foi possível salvar a URL.'); }
+    pendingLamp.current = null;
     setTemperature(null); setHumidity(null); setLamp(null);
     service.connect(address, (next, message) => { setStatus(next); setDetail(message ?? ''); }, receive);
   }
-  function disconnect() { service.disconnect(); setStatus('disconnected'); setDetail(''); }
+  function disconnect() { pendingLamp.current = null; service.disconnect(); setStatus('disconnected'); setDetail(''); }
   async function toggleTheme() {
     const next = dark ? 'light' : 'dark'; setTheme(next);
     try { await AsyncStorage.setItem('theme', next); } catch { Alert.alert('Erro', 'Não foi possível salvar o tema.'); }
@@ -68,8 +76,10 @@ export default function App() {
     if (status !== 'connected') { Alert.alert('Sem conexão', 'Conecte ao broker antes de enviar um comando.'); return; }
     setSending(true);
     const payload = JSON.stringify({ action });
-    try { await service.publish(TOPICS.command, payload); addEntry(TOPICS.command, payload, 'enviada'); setDetail('Comando enviado. Aguardando confirmação da lâmpada.'); }
-    catch (error) { Alert.alert('Falha ao enviar', error instanceof Error ? error.message : 'Tente novamente.'); }
+    pendingLamp.current = action;
+    setDetail('Enviando comando. Aguardando confirmação da lâmpada.');
+    try { await service.publish(TOPICS.command, payload); addEntry(TOPICS.command, payload, 'enviada'); }
+    catch (error) { pendingLamp.current = null; setDetail(''); Alert.alert('Falha ao enviar', error instanceof Error ? error.message : 'Tente novamente.'); }
     finally { setSending(false); }
   }
   const button = (label: string, onPress: () => void, disabled = false) => <Pressable accessibilityRole="button" disabled={disabled} onPress={onPress} style={[styles.button, { backgroundColor: colors.accent, opacity: disabled ? 0.5 : 1 }]}><Text style={styles.buttonText}>{label}</Text></Pressable>;
