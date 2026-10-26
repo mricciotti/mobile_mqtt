@@ -63,4 +63,24 @@ O estado só muda após uma mensagem válida de confirmação. Mensagens inváli
 - **Histórico:** dez mensagens mais recentes com tópico, payload, direção e horário.
 - **Configurações:** broker, conexão e tema claro/escuro.
 
-Os prints do app em execução ainda precisam ser adicionados para a entrega. Teste o fluxo também no Android e iOS: gerar o pacote não substitui a verificação em dispositivo. A entrega é o link acessível do repositório no Teams.
+### Evidências de execução no Android
+
+As imagens foram capturadas durante testes no emulador Android. O horário exibido segue o fuso configurado no emulador.
+
+**Dashboard em tema escuro:** leituras de temperatura e umidade e confirmação de estado da lâmpada, com o simulador em execução.
+
+![Dashboard e simulador](docs/evidencias/dashboard.png)
+
+**Histórico:** mensagens recebidas dos sensores com horário, tópico e payload.
+
+![Histórico de sensores](docs/evidencias/historico.png)
+
+**Comando e confirmação:** o histórico registra o comando enviado e o estado recebido.
+
+![Comando e confirmação no histórico](docs/evidencias/comando-historico.png)
+
+**Configurações:** endereço do broker, conexão e seletor de tema. Captura anterior ao ajuste da mensagem de confirmação.
+
+![Configurações](docs/evidencias/configuracoes.png)
+
+O fluxo foi demonstrado em emulador Android. A compilação do pacote JavaScript para iOS foi concluída, mas a execução no iOS ainda não foi validada em dispositivo ou simulador. A entrega é o link acessível do repositório no Teams.
