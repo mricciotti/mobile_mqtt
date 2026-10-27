@@ -1,21 +1,55 @@
-import { StyleSheet, Text, View } from "react-native";
-
-export function DashboardScreen() {
+import { Text, View } from "react-native";
+import type { IoTModel } from "../hooks/useIoT";
+import { SensorCard } from "../components/SensorCard";
+import { ConnectionStatus } from "../components/ConnectionStatus";
+import { ActionButton, Card, formatTime, styles } from "../components/ui";
+export function DashboardScreen({ model: m }: { model: IoTModel }) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>IoT Control</Text>
-      <Text style={styles.description}>Painel de monitoramento e controle IoT</Text>
-      <Text style={styles.status}>MQTT ainda não configurado</Text>
-      <Text style={styles.value}>Temperatura: -- °C</Text>
-      <Text style={styles.value}>Umidade: -- %</Text>
-      <Text style={styles.value}>Lâmpada: estado desconhecido</Text>
-    </View>
+    <>
+      <Text style={[styles.title, { color: m.colors.text }]}>IoT Control</Text>
+      <Text style={{ color: m.colors.muted }}>Monitoramento em tempo real</Text>
+      <ConnectionStatus status={m.status} detail={m.detail} colors={m.colors} />
+      <SensorCard
+        name="Temperatura"
+        reading={m.temperature}
+        unit="°C"
+        colors={m.colors}
+      />
+      <SensorCard
+        name="Umidade"
+        reading={m.humidity}
+        unit="%"
+        colors={m.colors}
+      />
+      <Card colors={m.colors}>
+        <Text style={[styles.label, { color: m.colors.text }]}>
+          Lâmpada:{" "}
+          {m.lamp
+            ? m.lamp.state === "ON"
+              ? "Ligada"
+              : "Desligada"
+            : "Aguardando estado"}
+        </Text>
+        <Text style={{ color: m.colors.muted }}>
+          {m.lamp
+            ? `Confirmado às ${formatTime(m.lamp.at)}`
+            : "O simulador deve confirmar o estado"}
+        </Text>
+        <View style={styles.row}>
+          <ActionButton
+            label="Ligar"
+            onPress={() => m.command("ON")}
+            disabled={m.sending}
+            colors={m.colors}
+          />
+          <ActionButton
+            label="Desligar"
+            onPress={() => m.command("OFF")}
+            disabled={m.sending}
+            colors={m.colors}
+          />
+        </View>
+      </Card>
+    </>
   );
 }
-const styles = StyleSheet.create({
-  container: { gap: 16 },
-  title: { fontSize: 32, fontWeight: "700", color: "#172033" },
-  description: { fontSize: 16, color: "#667085" },
-  status: { color: "#b45309", fontWeight: "600" },
-  value: { fontSize: 18, color: "#172033" },
-});

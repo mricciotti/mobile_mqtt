@@ -12,14 +12,25 @@ Checkpoint 3 — Mobile Development & IoT. Aplicativo em React Native, Expo e Ty
 
 ## Tecnologias
 
-Expo SDK 54, React Native 0.81, React 19, TypeScript, MQTT.js e AsyncStorage. Consulte o `package.json` para as versões declaradas.
+| Tecnologia | Versão declarada |
+| --- | --- |
+| Expo | SDK 54 (`~54.0.0`) |
+| React Native | 0.81.5 |
+| React / React DOM | 19.1.0 |
+| TypeScript | `~5.9.2` |
+| MQTT.js | `^5.16.1` |
+| AsyncStorage | 2.2.0 |
+| Safe Area Context | `~5.6.0` |
+| React Native Web | `^0.21.0` |
+
+As versões instaladas são fixadas no `package-lock.json`.
 
 ## Instalação e execução
 
 Requisitos: Node.js, npm, Expo Go compatível com SDK 54 ou emulador Android/iOS.
 
 ```bash
-npm install
+npm ci
 npx expo start
 ```
 
@@ -35,6 +46,24 @@ No aplicativo, abra **Configurações** e toque em **Conectar**. O endereço pad
 $env:MQTT_URL = 'wss://broker.hivemq.com:8884/mqtt'
 npm run simulator
 ```
+
+Em bash/zsh (Linux/macOS):
+
+```bash
+MQTT_URL='wss://broker.hivemq.com:8884/mqtt' npm run simulator
+```
+
+## Organização
+
+- `App.tsx`: navegação e área segura da aplicação.
+- `src/screens/`: Dashboard, Histórico e Configurações.
+- `src/components/`: cartões de sensores, conexão, mensagens e controles reutilizáveis.
+- `src/hooks/useIoT.ts`: estado do painel e ciclo de comandos.
+- `src/services/mqttService.ts`: MQTT, inscrições, reconexão e limpeza.
+- `src/services/storageService.ts`: leitura e gravação de preferências com AsyncStorage.
+- `src/themes/colors.ts`: paletas Light/Dark.
+- `src/types/mqtt.ts`: tipos de leituras, estado e mensagens.
+- `simulator/device.cjs`: segundo cliente MQTT, sensores e lâmpada virtual.
 
 ## Tópicos e mensagens
 
@@ -55,11 +84,11 @@ Base exclusiva do grupo: `fiap/3espv/mobile-mqtt-rm556930`.
 4. Repita com **Desligar**; confira o histórico das últimas dez mensagens.
 5. Em Configurações, alterne o tema e reinicie o app para verificar a persistência. A URL também é salva ao conectar.
 
-O estado só muda após uma mensagem válida de confirmação. Mensagens inválidas aparecem no histórico, mas não alteram as leituras. Ao desconectar, comandos são recusados com aviso. O histórico é mantido somente durante a sessão. O simulador confirma o estado inicial ao conectar; como não usa mensagens retidas, se o app conectar depois, o estado aparece ao receber o próximo comando confirmado.
+O estado só muda após uma mensagem válida de confirmação. Mensagens inválidas aparecem no histórico, mas não alteram as leituras. Ao desconectar, comandos são recusados com aviso. O histórico é mantido somente durante a sessão. O simulador publica o estado ao conectar e o republica a cada cinco segundos junto com os sensores. Assim, mesmo conectando o app depois do simulador, o estado aparece no próximo ciclo. As mensagens não são retidas: o broker não apresenta uma confirmação antiga como estado inicial quando o simulador está desligado. Se um comando ficar sem confirmação por cinco segundos, o app informa a falha e libera uma nova tentativa. Durante a conexão, exibe um indicador de carregamento.
 
 ## Telas e evidências
 
-Capturas reais da aplicação **Expo Web**, feitas pelo navegador durante o teste em 26/10/2026. As imagens mostram somente a aplicação, sem o desktop. Clique em cada captura para ampliá-la.
+Capturas reais da aplicação **Expo Web**, feitas pelo navegador durante o teste em 26/10/2026. Clique em cada captura para ampliá-la.
 
 ### Tema claro
 
@@ -90,18 +119,13 @@ Capturas reais da aplicação **Expo Web**, feitas pelo navegador durante o test
 As leituras são simuladas. Os horários das novas capturas seguem o fuso do navegador; os números variam conforme as mensagens recebidas. Os prints do histórico mostram a parte visível de uma lista com rolagem.
 
 <details>
-<summary><strong>Evidências complementares no Android — Pixel 4 emulado</strong></summary>
+<summary><strong>Android — Pixel 4</strong></summary>
 
-As capturas abaixo foram fornecidas pelo grupo nos testes do Android. Elas preservam o contexto do simulador e do emulador.
-
-| Evidência | Imagem |
+| Teste | Evidência |
 | --- | --- |
-| Dashboard e simulador | [Abrir captura](docs/evidencias/dashboard.png) |
-| Leituras no histórico | [Abrir captura](docs/evidencias/historico.png) |
-| Comando enviado e confirmação recebida | [Abrir captura](docs/evidencias/comando-historico.png) |
-| Configurações | [Abrir captura](docs/evidencias/configuracoes.png) |
-
-A captura Android de Configurações é anterior ao ajuste do texto de confirmação. Os horários seguem o fuso configurado no emulador.
+| Sensores e lâmpada | [Dashboard](docs/evidencias/dashboard.png) |
+| Mensagens recebidas | [Histórico](docs/evidencias/historico.png) |
+| Comando enviado e resposta recebida | [Comando e confirmação](docs/evidencias/comando-historico.png) |
 
 </details>
 
@@ -110,8 +134,21 @@ A captura Android de Configurações é anterior ao ajuste do texto de confirma�
 - **Android:** fluxo demonstrado pelo grupo no emulador Pixel 4.
 - **Web:** conexão, sensores, comandos, confirmações, histórico e alternância de tema exercitados no navegador.
 - **iOS:** pacote JavaScript compilado, sem execução em dispositivo ou simulador iOS.
-- A persistência da URL alterada e do tema após encerrar/reabrir o aplicativo ainda precisa de verificação específica.
+- A recuperação de URL e tema foi coberta por teste automatizado de gravação e remontagem, com AsyncStorage simulado. Isso não equivale a uma nova execução no dispositivo.
+
+## Verificações
+
+```bash
+npm run typecheck
+npm test
+npx expo export --platform all
+```
+
+Os testes cobrem o ciclo de conexão/reconexão e limpeza de listeners, validação de mensagens, limite do histórico, timeout e confirmação da lâmpada, preferências após remontagem e republicação do estado pelo simulador. São testes locais com clientes e armazenamento simulados; não dependem da disponibilidade do broker público.
+
+Para verificar a persistência no dispositivo, altere o tema e conecte usando uma URL válida diferente (por exemplo, `wss://broker.hivemq.com:8884/mqtt?teste=1`). Feche completamente o app e reabra: o tema e o endereço devem ser recuperados, sem conexão automática. Retorne ao endereço padrão após o teste.
 
 ## Entrega
 
 Enviar somente o link acessível deste repositório na tarefa do Microsoft Teams. Não é necessário vídeo ou apresentação.
+

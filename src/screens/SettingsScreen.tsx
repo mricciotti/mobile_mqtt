@@ -1,15 +1,51 @@
-import { StyleSheet, Text, View } from "react-native";
-
-export function SettingsScreen() {
+import { Switch, Text, TextInput, View } from "react-native";
+import type { IoTModel } from "../hooks/useIoT";
+import { BASE } from "../services/mqttService";
+import { ConnectionStatus } from "../components/ConnectionStatus";
+import { ActionButton, styles } from "../components/ui";
+export function SettingsScreen({ model: m }: { model: IoTModel }) {
+  const active = m.status === "connected" || m.status === "connecting";
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Configurações</Text>
-      <Text style={styles.description}>A configuração do broker e do tema será adicionada nesta tela.</Text>
-    </View>
+    <>
+      <Text style={[styles.title, { color: m.colors.text }]}>
+        Configurações
+      </Text>
+      <Text style={[styles.label, { color: m.colors.text }]}>
+        URL WebSocket do broker
+      </Text>
+      <TextInput
+        accessibilityLabel="URL WebSocket do broker"
+        value={m.url}
+        onChangeText={m.setUrl}
+        autoCapitalize="none"
+        autoCorrect={false}
+        editable={!active}
+        style={[
+          styles.input,
+          {
+            color: m.colors.text,
+            backgroundColor: m.colors.card,
+            borderColor: m.colors.border,
+          },
+        ]}
+      />
+      <ConnectionStatus status={m.status} detail={m.detail} colors={m.colors} />
+      <ActionButton
+        label={active ? "Desconectar" : "Conectar"}
+        onPress={active ? m.disconnect : m.connect}
+        colors={m.colors}
+      />
+      <View style={styles.row}>
+        <Text style={[styles.label, { color: m.colors.text }]}>
+          Tema escuro
+        </Text>
+        <Switch
+          accessibilityLabel="Tema escuro"
+          value={m.dark}
+          onValueChange={m.toggleTheme}
+        />
+      </View>
+      <Text style={{ color: m.colors.muted }}>Tópico-base: {BASE}</Text>
+    </>
   );
 }
-const styles = StyleSheet.create({
-  container: { gap: 16 },
-  title: { fontSize: 28, fontWeight: "700", color: "#172033" },
-  description: { fontSize: 16, color: "#667085" },
-});
