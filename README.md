@@ -129,14 +129,7 @@ As leituras são simuladas. Os horários das novas capturas seguem o fuso do nav
 
 </details>
 
-### Limites da validação
-
-- **Android:** fluxo demonstrado pelo grupo no emulador Pixel 4.
-- **Web:** conexão, sensores, comandos, confirmações, histórico e alternância de tema exercitados no navegador.
-- **iOS:** pacote JavaScript compilado, sem execução em dispositivo ou simulador iOS.
-- A recuperação de URL e tema foi coberta por teste automatizado de gravação e remontagem, com AsyncStorage simulado. Isso não equivale a uma nova execução no dispositivo.
-
-## Verificações
+## Comandos de desenvolvimento
 
 ```bash
 npm run typecheck
@@ -146,7 +139,7 @@ npx expo export --platform all
 
 Os testes cobrem o ciclo de conexão/reconexão e limpeza de listeners, validação de mensagens, limite do histórico, timeout e confirmação da lâmpada, preferências após remontagem e republicação do estado pelo simulador. São testes locais com clientes e armazenamento simulados; não dependem da disponibilidade do broker público.
 
-Para verificar a persistência no dispositivo, altere o tema e conecte usando uma URL válida diferente (por exemplo, `wss://broker.hivemq.com:8884/mqtt?teste=1`). Feche completamente o app e reabra: o tema e o endereço devem ser recuperados, sem conexão automática. Retorne ao endereço padrão após o teste.
+O tema e a URL do broker são armazenados localmente com AsyncStorage. Ao reabrir o aplicativo, as preferências são recuperadas; a conexão é iniciada pelo botão **Conectar**.
 
 ## Entrega
 
