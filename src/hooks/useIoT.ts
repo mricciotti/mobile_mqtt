@@ -11,12 +11,6 @@ export function useIoT() {
   const pendingLamp = useRef<LampState | null>(null);
   const commandTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  function clearCommand() {
-    pendingLamp.current = null;
-    if (commandTimer.current) clearTimeout(commandTimer.current);
-    commandTimer.current = null;
-    setSending(false);
-  }
   const [url, setUrl] = useState(DEFAULT_URL);
   const [theme, setTheme] = useState<Theme>("light");
   const [ready, setReady] = useState(false);
@@ -29,6 +23,13 @@ export function useIoT() {
   );
   const [history, setHistory] = useState<Entry[]>([]);
   const [sending, setSending] = useState(false);
+
+  function clearCommand() {
+    pendingLamp.current = null;
+    if (commandTimer.current) clearTimeout(commandTimer.current);
+    commandTimer.current = null;
+    setSending(false);
+  }
   const dark = theme === "dark";
   const colors = themes[theme];
 

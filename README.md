@@ -27,7 +27,7 @@ As versões instaladas são fixadas no `package-lock.json`.
 
 ## Instalação e execução
 
-Requisitos: Node.js, npm, Expo Go compatível com SDK 54 ou emulador Android/iOS.
+Requisitos: **Node.js 20.19.4 ou superior**, npm e Expo Go compatível com SDK 54 ou emulador Android/iOS.
 
 ```bash
 npm ci
@@ -75,6 +75,22 @@ Base exclusiva do grupo: `fiap/3espv/mobile-mqtt-rm556930`.
 | `/sensor/umidade` | Recebe | `{"value":58}` |
 | `/lampada/comando` | Envia | `{"action":"ON"}` ou `{"action":"OFF"}` |
 | `/lampada/estado` | Recebe | `{"state":"ON"}` ou `{"state":"OFF"}` |
+
+## Funcionalidades
+
+- **Dashboard:** mostra o status da conexão, temperatura, umidade e horário de atualização das leituras.
+- **Controle da lâmpada:** os botões Ligar e Desligar enviam comandos; o estado muda após a resposta do simulador, com aviso de timeout em cinco segundos.
+- **Histórico:** exibe as dez mensagens mais recentes da sessão, com tópico, conteúdo, direção e horário.
+- **Configurações:** permite definir o broker, conectar, desconectar e alternar entre os temas claro e escuro.
+- **Preferências:** salva a URL do broker e o tema com AsyncStorage para recuperar ao reabrir o aplicativo.
+
+## Limitações e configurações necessárias
+
+- A execução foi demonstrada no Android (emulador Pixel 4) e na Web. O iOS não foi executado em dispositivo ou simulador.
+- O broker público é compartilhado e não exige autenticação; qualquer pessoa pode publicar nos tópicos. Use o identificador exclusivo do grupo e somente dados de demonstração.
+- O histórico fica em memória durante a sessão e é reiniciado ao encerrar o aplicativo.
+- A conexão começa pelo botão **Conectar**; aplicativo e simulador devem usar o mesmo broker e tópico-base.
+- O ambiente de desenvolvimento requer **Node.js 20.19.4 ou superior**.
 
 ## Demonstração
 
