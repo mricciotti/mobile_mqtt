@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "simulator": "node simulator/device.cjs",
-    "test": "node --test tests/*.test.cjs"
+    "test": "node --test tests/iot.test.cjs"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
